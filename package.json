@@ -1,0 +1,48 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev-app": "vite --config vite.admin.config.js",
+        "dev-site": "vite --config vite.config.js",
+        "dev": "npm run dev-app && npm run dev-site",
+        "build-app": "vite build --config vite.admin.config.js",
+        "build-site": "vite build --config vite.config.js",
+        "build": "npm run build-app && npm run build-site"
+    },
+    "devDependencies": {
+        "@popperjs/core": "^2.11.6",
+        "@tailwindcss/forms": "^0.3.4",
+        "autoprefixer": "^10.4.20",
+        "axios": "^1.1.2",
+        "bootstrap": "^5.2.3",
+        "daisyui": "^4.11.1",
+        "postcss": "^8.4.20",
+        "sass": "^1.56.1",
+        "tailwindcss": "^3.2.0"
+    },
+    "dependencies": {
+        "@rollup/plugin-inject": "^5.0.5",
+        "@tailwindcss/typography": "^0.4.1",
+        "aos": "^2.3.4",
+        "filepond": "^4.31.1",
+        "flatpickr": "^4.6.13",
+        "flowbite": "^2.0.0",
+        "intl-tel-input": "^23.1.0",
+        "jquery": "^3.7.1",
+        "laravel-vite-plugin": "^1.0.5",
+        "owl.carousel": "^2.3.4",
+        "preline": "^2.0.3",
+        "sweetalert2": "11.14.5",
+        "vite": "^5.0.0",
+        "ws": "^8.17.1"
+    },
+    "name": "candy-form",
+    "description": "<p align=\"center\"><a href=\"https://laravel.com\" target=\"_blank\"><img src=\"https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg\" width=\"400\" alt=\"Laravel Logo\"></a></p>",
+    "version": "1.0.0",
+    "main": "index.js",
+    "directories": {
+        "test": "tests"
+    },
+    "author": "",
+    "license": "ISC"
+}

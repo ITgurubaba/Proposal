@@ -1,0 +1,83 @@
+# Laravel
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+Homestead.json
+Homestead.lock
+npm-debug.log
+yarn-error.log
+
+# IDE
+/.idea
+/.vscode
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Build artifacts
+/public/build
+/public/css
+/public/js
+/public/mix-manifest.json
+
+# Database
+/database/*.sqlite
+/database/*.sqlite-journal
+
+# Logs
+/storage/logs/*.log
+/storage/logs/laravel.log
+
+# Cache
+/bootstrap/cache/*.php
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+!storage/framework/cache/.gitkeep
+!storage/framework/sessions/.gitkeep
+!storage/framework/views/.gitkeep
+
+# User uploads (if you want to exclude uploaded files)
+# Uncomment the following line if you don't want to track uploaded files
+# /public/uploads/*
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.cache
+
+# Composer
+/vendor/composer/
+
+# PHPUnit
+.phpunit.result.cache
+.phpunit.cache
+
+# Testing
+/tests/coverage/
+
+# Laravel specific
+/storage/app/*
+!storage/app/.gitkeep
+/storage/logs/*
+!storage/logs/.gitkeep
+/storage/framework/*
+!storage/framework/.gitkeep

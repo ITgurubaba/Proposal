@@ -1,0 +1,251 @@
+@import url('https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@100..1000&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Style+Script&display=swap');
+@import "../plugins/intl-phone-input.css";
+@import "sweetalert2/dist/sweetalert2.css";
+@import 'aos/dist/aos.css';
+
+@config "tailwind.config.js";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body{
+    scroll-behavior: smooth;
+}
+
+.iti{
+    @apply w-full block;
+}
+
+.intl-phone-input{}
+
+.text-primary{
+    color: var(--logo-main-color);
+}
+
+:root {
+    --logo-main-color: #d2c18c;
+    --logo-dark-color: #bf9243;
+    --prop-bg-primary:#00342e;
+}
+
+.mary-choices-element{
+    @apply bg-primary text-white;
+}
+
+.btn-warning{
+    background-color: var(--logo-main-color);
+    color: #ffffff;
+    border: none;
+}
+.dark .btn-warning{
+    color: #111111;
+}
+
+.btn-warning:hover{
+    background-color: var(--logo-dark-color);
+    color: white;
+}
+
+.bg-logo-main{
+    background-color: var(--logo-main-color);
+}
+
+.dark .text-site-main,.hover .text-site-main, .text-site-main{
+    color: var(--logo-main-color);
+}
+
+.text-site-dark{
+    color: var(--logo-dark-color);
+}
+.font-family-main{
+    font-family: "Afacad Flux", sans-serif;
+}
+
+/* For Owl Slider */
+
+.owl-nav-1 .owl-nav {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+}
+
+.owl-nav-1 .owl-prev,
+.owl-nav-1 .owl-next {
+    position: absolute;
+    top: 0;
+    transform: translateY(-50%);
+}
+
+.owl-nav-1 .owl-prev {
+    left: -5%;
+}
+
+.owl-nav-1 .owl-next {
+    right: -5%;
+}
+
+.owl-nav-1 .owl-next span,.owl-prev span{
+    padding: 9px 16px 10px 16px;
+    background: rgb(0,0,0,0.7);
+    border-radius: 50%;
+    color: white;
+    transition: 0.5s linear;
+}
+.owl-nav-1 .owl-next span:hover,.owl-prev span:hover{
+    background: rgb(0,0,0,0.5);
+}
+
+
+/* Blog Post Page */
+
+.blog-content-area h1,.blog-content-area h2,.blog-content-area h3,.blog-content-area h4{
+    @apply mb-3 font-bold;
+}
+
+.blog-content-area h1{
+    @apply text-4xl;
+}
+
+.blog-content-area h2{
+    @apply text-3xl;
+}
+
+.blog-content-area h3{
+    @apply text-2xl;
+}
+
+.blog-content-area p{
+    @apply mb-2;
+}
+
+/* Blog Post Page Ends */
+.collapse{
+    @apply rounded-xl mb-5;
+}
+
+/* Volume css */
+.volume-slider {
+    -webkit-appearance: none; /* Override default CSS styles */
+    appearance: none;
+    width: 100%;
+    height: 5px; /* Change the height of the slider */
+    background-color: #d2c18c; /* Change the background color of the slider */
+    border-radius: 5px; /* Add a border radius to the slider */
+    outline: none; /* Remove the outline */
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default CSS styles */
+    appearance: none;
+    width: 15px; /* Change the width of the slider thumb */
+    height: 15px; /* Change the height of the slider thumb */
+    border-radius: 50%; /* Add a border radius to the slider thumb */
+    cursor: pointer; /* Change the cursor shape */
+    @apply bg-gray-700;
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 15px; /* Change the width of the slider thumb */
+    height: 15px; /* Change the height of the slider thumb */
+    border-radius: 50%; /* Add a border radius to the slider thumb */
+    cursor: pointer; /* Change the cursor shape */
+    @apply bg-gray-700;
+}
+.choice-list, .max-h-64{
+    max-height: 16rem!important;
+}
+
+
+/* Property Css */
+
+.prop_nav_active{
+    @apply relative inline-block text-white focus:outline-none before:absolute before:bottom-[-2px] before:start-0 before:-z-[1] before:w-full before:h-1 before:bg-lime-500 dark:before:bg-[var(--logo-main-color)] dark:text-white;
+}
+
+.prop_nav_inactive{
+    @apply inline-block text-white border-b-2 border-b-transparent hover:text-gray-50 hover:border-b-2 hover:border-b-gray-50 transition ease-in-out duration-300;
+}
+
+.prop_btn{
+    @apply px-6 py-2;
+}
+
+.prop_btn_1{
+    @apply bg-transparent border-2 border-white rounded-full transition duration-300 text-white;
+}
+
+.prop_btn_1:hover{
+    @apply bg-white duration-500 text-black;
+}
+
+.prop_btn_2{
+    @apply bg-yellow-500 border-2 border-yellow-500 rounded-full transition duration-300 text-black;
+}
+.prop_btn_2:hover{
+    @apply bg-yellow-600 border-2 border-yellow-600 duration-300;
+}
+
+.prop_btn_3{
+    @apply bg-transparent hover:bg-[var(--prop-bg-primary)] text-[var(--prop-bg-primary)] hover:text-white border-2 border-[var(--prop-bg-primary)] hover:border-2 hover:border-[var(--prop-bg-primary)] rounded-full transition duration-300;
+}
+
+.prop_header{
+    background-color: #00342e!important;
+}
+
+.bg-prop{
+    background-color: #00342e!important;
+}
+.text-prop{
+    color: #00342e!important;
+}
+
+div.marquee>a>img {
+    height: 75px;
+}
+
+.logoMarqueeSection>div>div {
+    padding-top: 0;
+    padding-bottom: 0;
+    min-height: 0;
+}
+
+.marquee-wrapper {
+    display:  inline-block;
+    white-space: nowrap;
+}
+
+.marquee {
+    display:  inline-block;
+    white-space: nowrap;
+    position: relative;
+    transform: translate3d(0%, 0, 0);
+    animation-name: marquee;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+.marquee a {
+    display:  inline-block;
+    white-space: nowrap;
+    padding-right: 5.4rem;
+}
+
+.marquee-wrapper:hover .marquee {
+    animation-play-state: paused !important;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translate3d(0%, 0, 0);
+    }
+
+    100% {
+        transform: translate3d(-100%, 0, 0);
+    }
+}

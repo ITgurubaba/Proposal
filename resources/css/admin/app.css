@@ -1,0 +1,89 @@
+@import "../plugins/intl-phone-input.css";
+@import "sweetalert2/dist/sweetalert2.css";
+@import "daisyui/dist/full.css";
+
+@config "tailwind.config.js";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.customScrollbar::-webkit-scrollbar {
+    width: 8px!important;           /* width of the entire scrollbar */
+}
+
+.customScrollbar::-webkit-scrollbar-track {
+    border-radius: 8px!important;
+    background-color: #f1f1f1!important;
+    border: 0.025em solid #f1f1f1!important;      /* color of the tracking area */
+}
+
+.customScrollbar::-webkit-scrollbar-thumb {
+    border-radius: 8px !important;
+    background-color: #c1c1c1 !important;
+}
+
+.dark .customScrollbar::-webkit-scrollbar-track {
+    border-radius: 8px!important;
+    background-color: #1a1e24!important;
+    border: 0.025em solid #1d232a!important;
+}
+
+.dark .customScrollbar::-webkit-scrollbar-thumb {
+    border-radius: 8px!important;
+    background-color: #2a323c!important;
+}
+
+#navbar .py-5{
+    padding: 5px 10px!important;
+}
+
+/*.tagInput input{*/
+/*    border: 0!important;*/
+/*}*/
+
+/*.tagInput input:focus{*/
+/*    border: 0!important;*/
+/*}*/
+
+/*.toggle-fix{*/
+/*    @apply relative w-11 h-6 p-px bg-gray-100 border-gray-300 text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-indigo-600 disabled:pointer-events-none checked:bg-none checked:text-indigo-600 checked:border-indigo-600 focus:checked:border-indigo-600 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-indigo-500 dark:checked:border-indigo-500 dark:focus:ring-offset-gray-600 before:inline-block before:size-5 before:bg-gray-300 checked:before:bg-indigo-600 focus:before:bg-white before:translate-x-0 checked:before:translate-x-full before:rounded-full before:shadow before:transform before:ring-0 before:transition before:ease-in-out before:duration-200 dark:before:bg-neutral-400 dark:checked:before:bg-indigo-200;*/
+/*}*/
+
+/*.toggle-input-lg-preLine{*/
+/*    @apply relative w-[3.25rem] h-7 p-px bg-gray-100 border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-indigo-600 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-indigo-600 checked:border-indigo-600 focus:checked:border-indigo-600 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-indigo-500 dark:checked:border-indigo-500 dark:focus:ring-offset-gray-600 before:inline-block before:size-6 before:bg-white checked:before:bg-indigo-200 before:translate-x-0 checked:before:translate-x-full before:rounded-full before:shadow before:transform before:ring-0 before:transition before:ease-in-out before:duration-200 dark:before:bg-neutral-400 dark:checked:before:bg-indigo-200;*/
+/*}*/
+
+/*.toggle-input-preLine{*/
+/*    @apply relative w-11 h-6 p-px bg-gray-100 border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-indigo-600 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-indigo-600 checked:border-indigo-600 focus:checked:border-indigo-600 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-indigo-500 dark:checked:border-indigo-500 dark:focus:ring-offset-gray-600 before:inline-block before:size-5 before:bg-white checked:before:bg-indigo-200 before:translate-x-0 checked:before:translate-x-full before:rounded-full before:shadow before:transform before:ring-0 before:transition before:ease-in-out before:duration-200 dark:before:bg-neutral-400 dark:checked:before:bg-indigo-200;*/
+/*}*/
+
+/*.toggle-input-sm-preLine{*/
+/*    @apply relative w-[35px] h-[21px] bg-gray-100 border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-indigo-600 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-indigo-600 checked:border-indigo-600 focus:checked:border-indigo-600 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-indigo-500 dark:checked:border-indigo-500 dark:focus:ring-offset-gray-600 before:inline-block before:size-4 before:bg-white checked:before:bg-indigo-200 before:translate-x-0 checked:before:translate-x-full before:rounded-full before:shadow before:transform before:ring-0 before:transition before:ease-in-out before:duration-200 dark:before:bg-neutral-400 dark:checked:before:bg-indigo-200;*/
+/*}*/
+
+.choice-list .max-h-64{
+    max-height: 16rem!important;
+}
+
+.iti{
+    @apply w-full block;
+}
+
+.intl-phone-input{
+}
+
+.overflow-x-merge{
+    @apply overflow-x-auto overflow-x-hidden;
+}
+
+.mary-table-pagination .hidden{
+    @apply gap-4;
+}
+.ck-powered-by-balloon{
+    display: none!important;
+}
+
+.seo-text{
+    color: #1a0dab;
+}
