@@ -108,6 +108,15 @@ Route::group([
         });
 
         Route::group([
+            'namespace' => 'ServiceContent',
+            'prefix' => 'service-content',
+            'as' => 'service-content:'
+        ], function () {
+
+            Route::get('/', 'ServiceContentManager')->name('list');
+        });
+
+        Route::group([
             'namespace' => 'Proposals',
             'prefix' => 'proposals',
             'as' => 'proposals:'
@@ -115,6 +124,8 @@ Route::group([
 
             Route::get('/', 'ProposalListPage')->name('list');
             Route::get('/create', 'ProposalCreatePage')->name('create');
+            Route::get('/edit/{proposal_id}', 'ProposalCreatePage')->name('edit');
+
             Route::get('/view/{proposal_id}', 'ProposalViewPage')->name('view');
         });
 

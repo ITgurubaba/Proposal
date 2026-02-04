@@ -24,7 +24,7 @@ class ClientAddEditPage extends Component
         return [
             'request.customer_type' => 'Customer Type',
             'request.company_registration_number' => 'Company Registration Number',
-            'request.contact_name' => 'Contact Name',
+            'request.company_name' => 'Company Name',
             'request.address_line_1' => 'Address Line 1',
             'request.address_line_2' => 'Address Line 2',
             'request.address_line_3' => 'Address Line 3',
@@ -41,21 +41,35 @@ class ClientAddEditPage extends Component
     protected function rules(): array
     {
         return [
+            // CLIENT
             'request.customer_type' => 'required|string|max:255',
             'request.company_registration_number' => 'nullable|string|max:255',
-            'request.contact_name' => 'required|string|max:255',
-            'request.address_line_1' => 'nullable|string|max:255',
+            'request.company_name' => 'required|string|max:255',
+
+            // 🔴 ADDRESS MANDATORY
+            'request.address_line_1' => 'required|string|max:255',
+            'request.city'           => 'required|string|max:255',
+            'request.zip_code'       => 'required|string|max:50',
+            'request.country'        => 'required|string|max:255',
+
+            // optional address parts
             'request.address_line_2' => 'nullable|string|max:255',
             'request.address_line_3' => 'nullable|string|max:255',
-            'request.city' => 'nullable|string|max:255',
-            'request.zip_code' => 'nullable|string|max:50',
-            'request.country' => 'nullable|string|max:255',
+
+            // 🔴 PRIMARY PERSON (FIRST PERSON) MANDATORY
+            'persons.0.first_name' => 'required|string|max:255',
+            'persons.0.last_name'  => 'required|string|max:255',
+            'persons.0.email'      => 'required|email|max:255',
+            'persons.0.phone'      => 'required|string|max:50',
+
+            // 🟡 OTHER PERSONS OPTIONAL
             'persons.*.first_name' => 'nullable|string|max:255',
-            'persons.*.last_name' => 'nullable|string|max:255',
-            'persons.*.email' => 'nullable|email|max:255',
-            'persons.*.phone' => 'nullable|string|max:50',
+            'persons.*.last_name'  => 'nullable|string|max:255',
+            'persons.*.email'      => 'nullable|email|max:255',
+            'persons.*.phone'      => 'nullable|string|max:50',
         ];
     }
+
 
     public function mount()
     {
@@ -88,27 +102,39 @@ class ClientAddEditPage extends Component
     }
 
 
-public function submitForm()
-{
-    if ($this->client_id) {
-        $this->save();
-    } else {
-        $this->submit();
+    public function submitForm()
+    {
+        if ($this->client_id) {
+            $this->save();
+        } else {
+            $this->submit();
+        }
     }
-}
 
 
- public function submit()
-{
-    $this->validate();
-    $this->createClient($this->request);
-}
+    public function submit()
+    {
+        if (count($this->persons) < 1) {
+            $this->addError('persons', 'At least one primary person is required.');
+            $this->activeTab = 'persons';
+            return;
+        }
 
-public function save()
-{
-    $this->validate();
-    $this->updateClient($this->request);
-}
+        $this->validate();
+        $this->createClient($this->request);
+    }
+
+    public function save()
+    {
+        if (count($this->persons) < 1) {
+            $this->addError('persons', 'At least one primary person is required.');
+            $this->activeTab = 'persons';
+            return;
+        }
+
+        $this->validate();
+        $this->updateClient($this->request);
+    }
 
 
 
@@ -133,7 +159,7 @@ public function save()
         }
     }
 
-   
+
 
     private function updateClient($data = []): void
     {
@@ -181,7 +207,7 @@ public function save()
         $this->request = [
             'customer_type' => '',
             'company_registration_number' => '',
-            'contact_name' => '',
+            'company_name' => '',
             'address_line_1' => '',
             'address_line_2' => '',
             'address_line_3' => '',
@@ -196,59 +222,64 @@ public function save()
         ];
     }
 
-  private function EditRequest($client): void
-{
-    $this->request = [
-        'customer_type' => $client->customer_type ?? '',
-        'company_registration_number' => $client->company_registration_number ?? '',
-        'contact_name' => $client->contact_name ?? '',
-        'address_line_1' => $client->address_line_1 ?? '',
-        'address_line_2' => $client->address_line_2 ?? '',
-        'address_line_3' => $client->address_line_3 ?? '',
-        'city' => $client->city ?? '',
-        'zip_code' => $client->zip_code ?? '',
-        'country' => $client->country ?? '',
-    ];
-
-    $this->persons = $client->persons->map(function ($person) {
-        return [
-            'id' => uniqid(), // important
-            'first_name' => $person->first_name ?? '',
-            'last_name' => $person->last_name ?? '',
-            'email' => $person->email ?? '',
-            'phone' => $person->phone ?? '',
+    private function EditRequest($client): void
+    {
+        $this->request = [
+            'customer_type' => $client->customer_type ?? '',
+            'company_registration_number' => $client->company_registration_number ?? '',
+            'company_name' => $client->company_name ?? '',
+            'address_line_1' => $client->address_line_1 ?? '',
+            'address_line_2' => $client->address_line_2 ?? '',
+            'address_line_3' => $client->address_line_3 ?? '',
+            'city' => $client->city ?? '',
+            'zip_code' => $client->zip_code ?? '',
+            'country' => $client->country ?? '',
         ];
-    })->toArray();
 
-    while (count($this->persons) < 2) {
+        $this->persons = $client->persons->map(function ($person) {
+            return [
+                'id' => uniqid(), // important
+                'first_name' => $person->first_name ?? '',
+                'last_name' => $person->last_name ?? '',
+                'email' => $person->email ?? '',
+                'phone' => $person->phone ?? '',
+            ];
+        })->toArray();
+
+        while (count($this->persons) < 2) {
+            $this->persons[] = $this->makePerson();
+        }
+    }
+
+    private function makePerson(): array
+    {
+        return [
+            'id' => uniqid(),
+            'first_name' => '',
+            'last_name' => '',
+            'email' => '',
+            'phone' => '',
+        ];
+    }
+
+    public function addNewPerson(): void
+    {
         $this->persons[] = $this->makePerson();
     }
-}
-
-private function makePerson(): array
-{
-    return [
-        'id' => uniqid(),
-        'first_name' => '',
-        'last_name' => '',
-        'email' => '',
-        'phone' => '',
-    ];
-}
-
-  public function addNewPerson(): void
-{
-    $this->persons[] = $this->makePerson();
-}
 
 
-   public function removePerson($index = null): void
-{
-    if (isset($this->persons[$index])) {
-        unset($this->persons[$index]);
-        $this->persons = array_values($this->persons);
+    public function removePerson($index = null): void
+    {
+        if (count($this->persons) <= 1) {
+            return; // 🚫 last primary person cannot be removed
+        }
+
+        if (isset($this->persons[$index])) {
+            unset($this->persons[$index]);
+            $this->persons = array_values($this->persons);
+        }
     }
-}
+
 
 
     public function getCustomerTypesProperty(): array

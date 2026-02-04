@@ -35,7 +35,7 @@
             @endscope
 
             @scope('cell_contact_name', $item)
-            {{ $item->contact_name ?? '' }}
+            {{ $item->company_name ?? '' }}
             @endscope
 
             @scope('cell_customer_type', $item)

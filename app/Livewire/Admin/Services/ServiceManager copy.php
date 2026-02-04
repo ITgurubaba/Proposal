@@ -11,52 +11,59 @@ class ServiceManager extends Component
 {
     public $services;
 
-    // ================= SERVICE =================
+    // Service fields
     public $service_id;
     public $name;
     public $base_price;
     public $pricing_type = 'individual';
 
-    // ================= FIELD =================
+    // Dynamic fields
     public $field_name;
     public $field_label;
     public $field_type = 'text';
     public $options = '';
     public $is_required = false;
 
-    // ================= SUB SERVICE =================
+    // Sub services (Service Items)
     public $item_name;
     public $item_price;
 
-    // ================= EDIT IDS =================
+    public $serviceId;
+    public $service; // single service
+
     public $editItemId = null;
     public $editFieldId = null;
 
-    // ================= SINGLE SERVICE =================
-    public $serviceId;
-    public $service;
 
-    // ================= MOUNT =================
     public function mount($service_id = null)
     {
         if ($service_id) {
-            // 👉 SINGLE SERVICE MODE
+            // EDIT MODE
             $this->serviceId = $service_id;
-            $this->service = Service::with(['fields','items'])->findOrFail($service_id);
+            $this->service = Service::with(['fields', 'items'])->findOrFail($service_id);
 
-            $this->service_id   = $this->service->id;
-            $this->name         = $this->service->name;
-            $this->base_price   = $this->service->base_price;
-            $this->pricing_type= $this->service->pricing_type;
+            // form fill
+            $this->service_id = $this->service->id;
+            $this->name = $this->service->name;
+            $this->base_price = $this->service->base_price;
+            $this->pricing_type = $this->service->pricing_type;
 
+            // only one service
             $this->services = collect([$this->service]);
         } else {
-            // 👉 ALL SERVICES MODE (optional)
-            $this->services = Service::with(['fields','items'])->get();
+            // ADD MODE
+            $this->services = Service::with(['fields', 'items'])->get();
         }
     }
 
-    // ================= SERVICE =================
+
+
+
+
+    // ======================
+    // SERVICE
+    // ======================
+
     public function saveService()
     {
         $this->validate([
@@ -74,9 +81,61 @@ class ServiceManager extends Component
             ]
         );
 
-        $this->reset(['service_id','name','base_price','pricing_type']);
+        $this->reset(['service_id', 'name', 'base_price', 'pricing_type']);
+        $this->refreshServices();
+
+        session()->flash('success', 'Service saved successfully');
+    }
+
+    public function editService($id)
+    {
+        $service = Service::findOrFail($id);
+
+        $this->service_id = $service->id;
+        $this->name = $service->name;
+        $this->base_price = $service->base_price;
+        $this->pricing_type = $service->pricing_type;
+    }
+
+    public function editField($id)
+    {
+        $field = ServiceField::findOrFail($id);
+
+        $this->editFieldId = $id;
+        $this->field_name = $field->field_name;
+        $this->field_label = $field->field_label;
+        $this->field_type = $field->field_type;
+        $this->options = is_array($field->options) ? implode(',', $field->options) : '';
+        $this->is_required = $field->is_required;
+    }
+
+    public function updateField($serviceId)
+    {
+        $this->validate([
+            'field_name' => 'required',
+            'field_label' => 'required',
+            'field_type' => 'required',
+        ]);
+
+        $options = null;
+        if ($this->field_type === 'select' && !empty(trim($this->options))) {
+            $options = array_map('trim', explode(',', $this->options));
+        }
+
+        ServiceField::where('id', $this->editFieldId)->update([
+            'field_name' => $this->field_name,
+            'field_label' => $this->field_label,
+            'field_type' => $this->field_type,
+            'options' => $options,
+            'is_required' => $this->is_required,
+        ]);
+
+        $this->reset(['field_name', 'field_label', 'field_type', 'options', 'is_required', 'editFieldId']);
         $this->refreshServices();
     }
+
+
+
 
     public function deleteService($id)
     {
@@ -84,22 +143,72 @@ class ServiceManager extends Component
         $this->refreshServices();
     }
 
-    // ================= SUB SERVICES =================
-    public function saveItem($serviceId)
+    // ======================
+    // SERVICE FIELDS
+    // ======================
+
+    public function saveField($serviceId)
     {
         $this->validate([
-            'item_name' => 'required',
-            'item_price' => 'nullable|numeric',
+            'field_name' => 'required',
+            'field_label' => 'required',
+            'field_type' => 'required',
         ]);
 
-        ServiceItem::create([
+        // Process options for select type
+        $options = null;
+        if ($this->field_type === 'select' && !empty(trim($this->options))) {
+            $optionsArray = array_map('trim', explode(',', $this->options));
+            // Filter out empty options
+            $optionsArray = array_filter($optionsArray, function ($value) {
+                return !empty($value);
+            });
+            // Only save if there are valid options
+            if (!empty($optionsArray)) {
+                $options = array_values($optionsArray); // Re-index array
+            }
+        }
+
+        ServiceField::create([
             'service_id' => $serviceId,
-            'name' => $this->item_name,
-            'price' => $this->item_price,
+            'field_name' => $this->field_name,
+            'field_label' => $this->field_label,
+            'field_type' => $this->field_type,
+            'options' => $options,
+            'is_required' => $this->is_required,
         ]);
 
-        $this->reset(['item_name','item_price']);
+        $this->reset(['field_name', 'field_label', 'field_type', 'options', 'is_required']);
         $this->refreshServices();
+
+        session()->flash('success', 'Field added successfully');
+    }
+
+    public function deleteField($id)
+    {
+        ServiceField::findOrFail($id)->delete();
+        $this->refreshServices();
+    }
+
+
+    public function updatedFieldType($value)
+    {
+        if ($value !== 'select') {
+            $this->options = ''; // agar select nahi hai to options clear
+        }
+    }
+
+
+    public function refreshServices()
+    {
+        if ($this->serviceId) {
+            // EDIT MODE → only one service
+            $this->service = Service::with(['fields', 'items'])->findOrFail($this->serviceId);
+            $this->services = collect([$this->service]);
+        } else {
+            // ADD MODE → all services
+            $this->services = Service::with(['fields', 'items'])->get();
+        }
     }
 
     public function editItem($id)
@@ -123,8 +232,33 @@ class ServiceManager extends Component
             'price' => $this->item_price,
         ]);
 
-        $this->reset(['item_name','item_price','editItemId']);
+        $this->reset(['item_name', 'item_price', 'editItemId']);
         $this->refreshServices();
+    }
+
+
+
+    // ======================
+    // SERVICE ITEMS (SUB SERVICES)
+    // ======================
+
+    public function saveItem($serviceId)
+    {
+        $this->validate([
+            'item_name' => 'required',
+            'item_price' => 'nullable|numeric',
+        ]);
+
+        ServiceItem::create([
+            'service_id' => $serviceId,
+            'name' => $this->item_name,
+            'price' => $this->item_price,
+        ]);
+
+        $this->reset(['item_name', 'item_price']);
+        $this->refreshServices();
+
+        session()->flash('success', 'Sub service added successfully');
     }
 
     public function deleteItem($id)
@@ -133,100 +267,9 @@ class ServiceManager extends Component
         $this->refreshServices();
     }
 
-    // ================= SERVICE FIELDS =================
-    public function saveField($serviceId)
-    {
-        $this->validate([
-            'field_name' => 'required',
-            'field_label' => 'required',
-            'field_type' => 'required',
-        ]);
-
-        $options = $this->processOptions();
-
-        ServiceField::create([
-            'service_id' => $serviceId,
-            'field_name' => $this->field_name,
-            'field_label' => $this->field_label,
-            'field_type' => $this->field_type,
-            'options' => $options,
-            'is_required' => $this->is_required,
-        ]);
-
-        $this->reset(['field_name','field_label','field_type','options','is_required']);
-        $this->refreshServices();
-    }
-
-    public function editField($id)
-    {
-        $field = ServiceField::findOrFail($id);
-
-        $this->editFieldId = $id;
-        $this->field_name = $field->field_name;
-        $this->field_label = $field->field_label;
-        $this->field_type = $field->field_type;
-        $this->options = is_array($field->options) ? implode(',', $field->options) : '';
-        $this->is_required = $field->is_required;
-    }
-
-    public function updateField($serviceId)
-    {
-        $this->validate([
-            'field_name' => 'required',
-            'field_label' => 'required',
-            'field_type' => 'required',
-        ]);
-
-        $options = $this->processOptions();
-
-        ServiceField::where('id', $this->editFieldId)->update([
-            'field_name' => $this->field_name,
-            'field_label' => $this->field_label,
-            'field_type' => $this->field_type,
-            'options' => $options,
-            'is_required' => $this->is_required,
-        ]);
-
-        $this->reset(['field_name','field_label','field_type','options','is_required','editFieldId']);
-        $this->refreshServices();
-    }
-
-    public function deleteField($id)
-    {
-        ServiceField::findOrFail($id)->delete();
-        $this->refreshServices();
-    }
-
-    // ================= HELPERS =================
-    private function processOptions()
-    {
-        if ($this->field_type === 'select' && !empty(trim($this->options))) {
-            return array_map('trim', explode(',', $this->options));
-        }
-        return null;
-    }
-
-    public function updatedFieldType($value)
-    {
-        if ($value !== 'select') {
-            $this->options = '';
-        }
-    }
-
-    // ================= REFRESH =================
-    public function refreshServices()
-    {
-        if ($this->serviceId) {
-            $this->service = Service::with(['fields','items'])->findOrFail($this->serviceId);
-            $this->services = collect([$this->service]);
-        } else {
-            $this->services = Service::with(['fields','items'])->get();
-        }
-    }
-
-    // ================= RENDER =================
     public function render()
     {
         return view('livewire.admin.services.service-manager');
     }
 }
+// ye mera h 

@@ -47,12 +47,7 @@ Thumbs.db
 
 # Cache
 /bootstrap/cache/*.php
-/storage/framework/cache/*
-/storage/framework/sessions/*
-/storage/framework/views/*
-!storage/framework/cache/.gitkeep
-!storage/framework/sessions/.gitkeep
-!storage/framework/views/.gitkeep
+
 
 # User uploads (if you want to exclude uploaded files)
 # Uncomment the following line if you don't want to track uploaded files
@@ -74,10 +69,3 @@ Thumbs.db
 # Testing
 /tests/coverage/
 
-# Laravel specific
-/storage/app/*
-!storage/app/.gitkeep
-/storage/logs/*
-!storage/logs/.gitkeep
-/storage/framework/*
-!storage/framework/.gitkeep

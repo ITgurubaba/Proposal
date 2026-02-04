@@ -17,17 +17,38 @@ class ProposalCreatePage extends Component
     public $selected_services = [];
     public $service_data = [];
     public $total_price = 0;
+    public $proposal_id;
 
     protected $rules = [
         'client_id' => 'required|exists:clients,id',
         'selected_services' => 'required|array|min:1',
     ];
 
-    public function mount()
+    public function mount($proposal_id = null)
     {
-        $this->selected_services = [];
-        $this->service_data = [];
+        $this->proposal_id = $proposal_id;
+
+        if ($proposal_id) {
+            $proposal = Proposal::with('services')->findOrFail($proposal_id);
+
+            // ❌ sent / accepted edit na ho
+            if (!in_array($proposal->status, ['draft', 'rejected'])) {
+                abort(403, 'Only draft or rejected proposals can be edited.');
+            }
+
+            $this->client_id = $proposal->client_id;
+            $this->total_price = $proposal->total_price;
+
+            foreach ($proposal->services as $ps) {
+                $this->selected_services[] = $ps->service_id;
+                $this->service_data[$ps->service_id] = $ps->data ?? [];
+            }
+        } else {
+            $this->selected_services = [];
+            $this->service_data = [];
+        }
     }
+
 
     public function getActiveServicesProperty()
     {
@@ -55,19 +76,28 @@ class ProposalCreatePage extends Component
 
         foreach ($this->selected_services as $serviceId) {
             $service = Service::find($serviceId);
+            if (!$service) continue;
 
-            if ($service) {
-                if ($service->pricing_type === 'bulk') {
-                    // Bulk pricing - use base price
-                    $this->total_price += $service->base_price;
+            // ✅ BULK
+            if ($service->pricing_type === 'bulk') {
+                if (!empty($this->service_data[$serviceId]['custom_price'])) {
+                    $this->total_price += (float)$this->service_data[$serviceId]['custom_price'];
                 } else {
-                    // Individual pricing - sum of selected items
-                    if (isset($this->service_data[$serviceId]['items'])) {
-                        foreach ($this->service_data[$serviceId]['items'] as $itemId => $selected) {
-                            if ($selected) {
+                    $this->total_price += (float)$service->base_price;
+                }
+            }
+
+            // ✅ INDIVIDUAL
+            else {
+                if (isset($this->service_data[$serviceId]['items'])) {
+                    foreach ($this->service_data[$serviceId]['items'] as $itemId => $selected) {
+                        if ($selected) {
+                            if (!empty($this->service_data[$serviceId]['item_prices'][$itemId])) {
+                                $this->total_price += (float)$this->service_data[$serviceId]['item_prices'][$itemId];
+                            } else {
                                 $item = $service->items()->find($itemId);
                                 if ($item && $item->price !== null) {
-                                    $this->total_price += $item->price;
+                                    $this->total_price += (float)$item->price;
                                 }
                             }
                         }
@@ -76,51 +106,77 @@ class ProposalCreatePage extends Component
             }
         }
     }
+
 
     public function saveProposal()
     {
         $this->validate();
 
-        $proposal = Proposal::create([
-            'client_id' => $this->client_id,
-            'total_price' => $this->total_price,
-            'status' => 'draft',
-        ]);
+        if ($this->proposal_id) {
+            // UPDATE MODE
+            $proposal = Proposal::findOrFail($this->proposal_id);
+
+            $proposal->update([
+                'client_id' => $this->client_id,
+                'total_price' => $this->total_price,
+            ]);
+
+            // old services delete
+            ProposalService::where('proposal_id', $proposal->id)->delete();
+        } else {
+            // CREATE MODE
+            $proposal = Proposal::create([
+                'client_id' => $this->client_id,
+                'total_price' => $this->total_price,
+                'status' => 'draft',
+            ]);
+        }
 
         foreach ($this->selected_services as $serviceId) {
             $service = Service::find($serviceId);
+            if (!$service) continue;
 
-            if ($service) {
-                $price = 0;
+            $price = 0;
 
-                if ($service->pricing_type === 'bulk') {
-                    $price = $service->base_price;
-                } else {
-                    if (isset($this->service_data[$serviceId]['items'])) {
-                        foreach ($this->service_data[$serviceId]['items'] as $itemId => $selected) {
-                            if ($selected) {
+            if ($service->pricing_type === 'bulk') {
+
+                $price = !empty($this->service_data[$serviceId]['custom_price'])
+                    ? (float) $this->service_data[$serviceId]['custom_price']
+                    : (float) $service->base_price;
+            } else {
+
+                if (isset($this->service_data[$serviceId]['items'])) {
+                    foreach ($this->service_data[$serviceId]['items'] as $itemId => $selected) {
+                        if ($selected) {
+
+                            if (!empty($this->service_data[$serviceId]['item_prices'][$itemId])) {
+                                $price += (float) $this->service_data[$serviceId]['item_prices'][$itemId];
+                            } else {
                                 $item = $service->items()->find($itemId);
                                 if ($item && $item->price !== null) {
-                                    $price += $item->price;
+                                    $price += (float) $item->price;
                                 }
                             }
                         }
                     }
                 }
-
-                ProposalService::create([
-                    'proposal_id' => $proposal->id,
-                    'service_id' => $serviceId,
-                    'price' => $price,
-                    'data' => $this->service_data[$serviceId] ?? [],
-                ]);
             }
+
+
+
+            ProposalService::create([
+                'proposal_id' => $proposal->id,
+                'service_id' => $serviceId,
+                'price' => $price,
+                'data' => $this->service_data[$serviceId] ?? [],
+            ]);
         }
 
-        $this->success('Proposal', 'Created successfully');
+        $this->success('Proposal', $this->proposal_id ? 'Updated successfully' : 'Created successfully');
 
         return redirect()->route('admin::proposals:list');
     }
+
 
     public function render()
     {

@@ -40,21 +40,22 @@ class ServiceManager extends Component
     public function mount($service_id = null)
     {
         if ($service_id) {
-            // 👉 SINGLE SERVICE MODE
+            // SINGLE SERVICE MODE
             $this->serviceId = $service_id;
-            $this->service = Service::with(['fields','items'])->findOrFail($service_id);
+            $this->service = Service::with(['fields', 'items'])->findOrFail($service_id);
 
-            $this->service_id   = $this->service->id;
-            $this->name         = $this->service->name;
-            $this->base_price   = $this->service->base_price;
-            $this->pricing_type= $this->service->pricing_type;
+            $this->service_id    = $this->service->id;
+            $this->name          = $this->service->name;
+            $this->base_price    = $this->service->base_price;
+            $this->pricing_type = $this->service->pricing_type;
 
             $this->services = collect([$this->service]);
         } else {
-            // 👉 ALL SERVICES MODE (optional)
-            $this->services = Service::with(['fields','items'])->get();
+            // 👉 NEW SERVICE MODE (EMPTY)
+            $this->services = collect(); // ❌ sab services mat lao
         }
     }
+
 
     // ================= SERVICE =================
     public function saveService()
@@ -65,7 +66,7 @@ class ServiceManager extends Component
             'pricing_type' => 'required',
         ]);
 
-        Service::updateOrCreate(
+        $service = Service::updateOrCreate(
             ['id' => $this->service_id],
             [
                 'name' => $this->name,
@@ -74,9 +75,15 @@ class ServiceManager extends Component
             ]
         );
 
-        $this->reset(['service_id','name','base_price','pricing_type']);
-        $this->refreshServices();
+        // ⭐ MOST IMPORTANT LINE
+        $this->serviceId = $service->id;
+
+        $this->service = Service::with(['fields', 'items'])->find($service->id);
+        $this->services = collect([$this->service]);
+
+        $this->service_id = $service->id;
     }
+
 
     public function deleteService($id)
     {
@@ -98,7 +105,7 @@ class ServiceManager extends Component
             'price' => $this->item_price,
         ]);
 
-        $this->reset(['item_name','item_price']);
+        $this->reset(['item_name', 'item_price']);
         $this->refreshServices();
     }
 
@@ -123,7 +130,7 @@ class ServiceManager extends Component
             'price' => $this->item_price,
         ]);
 
-        $this->reset(['item_name','item_price','editItemId']);
+        $this->reset(['item_name', 'item_price', 'editItemId']);
         $this->refreshServices();
     }
 
@@ -153,7 +160,7 @@ class ServiceManager extends Component
             'is_required' => $this->is_required,
         ]);
 
-        $this->reset(['field_name','field_label','field_type','options','is_required']);
+        $this->reset(['field_name', 'field_label', 'field_type', 'options', 'is_required']);
         $this->refreshServices();
     }
 
@@ -187,7 +194,7 @@ class ServiceManager extends Component
             'is_required' => $this->is_required,
         ]);
 
-        $this->reset(['field_name','field_label','field_type','options','is_required','editFieldId']);
+        $this->reset(['field_name', 'field_label', 'field_type', 'options', 'is_required', 'editFieldId']);
         $this->refreshServices();
     }
 
@@ -217,12 +224,11 @@ class ServiceManager extends Component
     public function refreshServices()
     {
         if ($this->serviceId) {
-            $this->service = Service::with(['fields','items'])->findOrFail($this->serviceId);
+            $this->service = Service::with(['fields', 'items'])->findOrFail($this->serviceId);
             $this->services = collect([$this->service]);
-        } else {
-            $this->services = Service::with(['fields','items'])->get();
         }
     }
+
 
     // ================= RENDER =================
     public function render()

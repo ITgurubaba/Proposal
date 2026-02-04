@@ -73,36 +73,22 @@ class Sidebar extends Component
                 ]
             ],
 
-
-            // 'Store' => [
-            //     'name' => "Store",
-            //     'icon' => 'o-building-storefront',
-            //     'subMenu' => [
-
-            //         'Tax' => [
-            //             'name' => "Vat Tax",
-            //             'link' => route('admin::ecommerce.tax'),
-            //             'subMenu' => []
-            //         ],
-            //     ]
-            // ],
-
-            // 'Grouping' => [
-            //     'name' => "Grouping",
-            //     'icon' => 'o-rectangle-group',
-            //     'subMenu' => [
-            //         'Country' => [
-            //             'name' => "Countries",
-            //             'link' => route('admin::grouping:countries'),
-            //             'subMenu' => []
-            //         ],
-            //         'Currency' => [
-            //             'name' => "Currency",
-            //             'link' => route('admin::grouping:currency'),
-            //             'subMenu' => []
-            //         ],
-            //     ]
-            // ],
+                'Content Manager' => [
+                'name' => "Content Manager",
+                'icon' => 'o-document-text',
+                'subMenu' => [
+                    'Manage Service Content' => [
+                        'name' => "Service Content",
+                        'link' => route('admin::service-content:list'),
+                        'subMenu' => []
+                    ],
+                    'Manage Policy Content' => [
+                        'name' => "Manage Policy",
+                        'link' => route('admin::service-content:list'),
+                        'subMenu' => []
+                    ],
+                ]
+            ],
 
             'Contact' => [
                 'name' => "Contact",

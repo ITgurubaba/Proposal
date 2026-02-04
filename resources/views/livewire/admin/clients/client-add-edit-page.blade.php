@@ -48,9 +48,9 @@
 
                                 <div class="mb-5">
                                     <x-mary-input
-                                        wire:model.defer="request.contact_name"
-                                        label="Contact Name"
-                                        placeholder="Enter contact name"
+                                        wire:model.defer="request.company_name"
+                                        label="Company Name"
+                                        placeholder="Enter company name"
                                         required
                                     />
                                 </div>

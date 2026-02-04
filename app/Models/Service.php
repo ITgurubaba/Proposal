@@ -24,4 +24,9 @@ class Service extends Model
     {
         return $this->hasMany(ServiceItem::class);
     }
+
+    public function contents()
+    {
+        return $this->hasMany(ServiceContent::class);
+    }
 }

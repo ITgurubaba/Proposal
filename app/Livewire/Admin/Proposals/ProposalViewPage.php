@@ -19,6 +19,7 @@ class ProposalViewPage extends Component
         $this->proposal = Proposal::with(['client', 'services.service', 'services.service.items', 'services.service.fields'])->findOrFail($proposal_id);
     }
 
+    
     public function sendProposal()
     {
         $this->proposal->status = 'sent';

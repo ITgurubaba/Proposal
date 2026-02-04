@@ -142,6 +142,61 @@
                                          </div>
                                      </div>
                                  @endif
+
+                                 {{-- Service Content --}}
+                                 @php
+                                     $serviceContents = $proposalService->service->contents->whereNull('service_item_id');
+                                     $itemContents = [];
+                                     if ($proposalService->service->pricing_type === 'individual' && isset($proposalService->data['items'])) {
+                                         foreach ($proposalService->data['items'] as $itemId => $selected) {
+                                             if ($selected) {
+                                                 $item = $proposalService->service->items->find($itemId);
+                                                 if ($item) {
+                                                     $itemContents[$itemId] = $item->contents ?? collect();
+                                                 }
+                                             }
+                                         }
+                                     }
+                                 @endphp
+
+                                 @if($serviceContents->count() > 0 || !empty($itemContents))
+                                     <div class="mt-4 border-t pt-4">
+                                         <div class="text-sm font-medium mb-3">Service Content:</div>
+
+                                         {{-- Service-level content --}}
+                                         @if($serviceContents->count() > 0)
+                                             @foreach($serviceContents as $content)
+                                                 <div class="mb-3">
+                                                     <div class="font-semibold text-sm">{{ $content->title }}</div>
+                                                     <div class="text-sm text-gray-600 mt-1 prose prose-sm max-w-none">
+                                                         {!! $content->content !!}
+                                                     </div>
+                                                 </div>
+                                             @endforeach
+                                         @endif
+
+                                         {{-- Item-level content for selected items --}}
+                                         @if(!empty($itemContents))
+                                             @foreach($itemContents as $itemId => $contents)
+                                                 @if($contents->count() > 0)
+                                                     <div class="mb-3">
+                                                         <div class="font-semibold text-sm text-primary">
+                                                             {{ $proposalService->service->items->find($itemId)->name }} Content:
+                                                         </div>
+                                                         @foreach($contents as $content)
+                                                             <div class="mt-2">
+                                                                 <div class="font-medium text-sm">{{ $content->title }}</div>
+                                                                 <div class="text-sm text-gray-600 mt-1 prose prose-sm max-w-none">
+                                                                     {!! $content->content !!}
+                                                                 </div>
+                                                             </div>
+                                                         @endforeach
+                                                     </div>
+                                                 @endif
+                                             @endforeach
+                                         @endif
+                                     </div>
+                                 @endif
                             </div>
                         @endforeach
                     </div>
