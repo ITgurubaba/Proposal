@@ -82,9 +82,9 @@ class Sidebar extends Component
                         'link' => route('admin::service-content:list'),
                         'subMenu' => []
                     ],
-                    'Manage Policy Content' => [
-                        'name' => "Manage Policy",
-                        'link' => route('admin::service-content:list'),
+                    'Manage other Content' => [
+                        'name' => "Manage other Content",
+                        'link' => route('admin::other-content:list'),
                         'subMenu' => []
                     ],
                 ]

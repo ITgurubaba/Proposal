@@ -21,6 +21,7 @@ class ServiceContentManager extends Component
     public $title = '';
     public $content = '';
     public $showAllContent = false;
+    public $availableFields = [];
 
 
     public function mount()
@@ -36,54 +37,53 @@ class ServiceContentManager extends Component
         return null;
     }
 
-    public function selectService($serviceId)
-    {
-        $this->selected_service_id = $serviceId;
-        $this->selected_item_id = null;
+  public function selectService($serviceId)
+{
+    $this->selected_service_id = $serviceId;
+    $this->selected_item_id = null;
 
-        $service = Service::find($serviceId);
-        if (!$service) return;
+    $service = Service::find($serviceId);
+    if (!$service) return;
 
-        $this->title = $service->name;
+    $this->title = $service->name;
 
-        $content = ServiceContent::where('service_id', $serviceId)
-            ->whereNull('service_item_id')
-            ->first();
+    $this->loadServiceFields($serviceId); // ⭐⭐⭐
 
-        if ($content) {
-            $this->content_id = $content->id;
-            $this->content = $content->content;
-        } else {
-            $this->resetForm(false);
-        }
+    $content = ServiceContent::where('service_id', $serviceId)
+        ->whereNull('service_item_id')
+        ->first();
 
-        $this->dispatch('refreshEditor', $this->content);
+    if ($content) {
+        $this->content_id = $content->id;
+        $this->content = $content->content;
+    } else {
+        $this->resetForm(false);
     }
+
+    $this->dispatch('refreshEditor', $this->content);
+}
 
     public function selectItem($itemId)
-    {
-        $this->selected_item_id = $itemId;
+{
+    $this->selected_item_id = $itemId;
 
-        // 🔴 VERY IMPORTANT: service_id bhi set karo
-        $item = ServiceItem::find($itemId);
-        if (!$item) return;
+    $item = ServiceItem::find($itemId);
+    if (!$item) return;
 
-        $this->selected_service_id = $item->service_id;
+    $this->selected_service_id = $item->service_id;
 
-        $this->title = $item->name;
+    $this->loadServiceFields($item->service_id); // ⭐⭐⭐
 
-        $content = ServiceContent::where('service_item_id', $itemId)->first();
+    $this->title = $item->name;
 
-        if ($content) {
-            $this->content_id = $content->id;
-            $this->content = $content->content;
-        } else {
-            $this->content_id = null;
-            $this->content = '';
-        }
+    $content = ServiceContent::where('service_item_id', $itemId)->first();
 
-        $this->dispatch('refreshEditor', $this->content);
-    }
+    $this->content_id = $content?->id;
+    $this->content = $content?->content ?? '';
+
+    $this->dispatch('refreshEditor', $this->content);
+}
+
 
     public function editContent($contentId)
     {
@@ -95,6 +95,13 @@ class ServiceContentManager extends Component
 
             $this->dispatch('refreshEditor', $this->content);
         }
+    }
+
+    private function loadServiceFields($serviceId)
+    {
+        $this->availableFields = \App\Models\ServiceField::where('service_id', $serviceId)
+            ->get(['field_name', 'field_label'])
+            ->toArray();
     }
 
     public function saveContent()

@@ -93,8 +93,8 @@ Route::group([
             Route::get('list', 'ContactFormListPage')->name('list');
         });
 
-      
-      
+
+
 
         Route::group([
             'namespace' => 'Services',
@@ -116,6 +116,20 @@ Route::group([
             Route::get('/', 'ServiceContentManager')->name('list');
         });
 
+
+        Route::group([
+            'namespace' => 'OtherContent',
+            'prefix' => 'other-content',
+            'as' => 'other-content:'
+        ], function () {
+
+            Route::get('/', 'OtherContentListPage')->name('list');
+            Route::get('/add', 'OtherContentAddEditPage')->name('add');
+            Route::get('/edit/{content_id}', 'OtherContentAddEditPage')->name('edit');
+        });
+
+
+
         Route::group([
             'namespace' => 'Proposals',
             'prefix' => 'proposals',
@@ -132,7 +146,7 @@ Route::group([
 
 
 
-        
+
         // Grouping
         Route::group([
             'namespace' => 'Grouping',
@@ -146,13 +160,13 @@ Route::group([
 
 
 
-       
+
         Route::group([
             'prefix' => 'ecommerce',
             'as' => 'ecommerce.',
         ], function () {
 
-            
+
             Route::group([
                 'namespace' => 'Ecommerce',
             ], function () {
@@ -160,12 +174,10 @@ Route::group([
                 Route::get('taxes', 'TaxListPage')->name('tax');
                 Route::get('shipping', 'ShippingListPage')->name('shipping');
                 Route::get('settings', 'SettingPage')->name('settings');
-
-             
             });
         });
 
-        
+
 
         Route::group([
             'prefix' => 'company',
@@ -183,11 +195,7 @@ Route::group([
                 Route::get('category', 'ClientCategoryPage')->name('category.list');
                 Route::get('attributes', 'ClientTypePage')->name('attributes.list');
             });
-
-            
         });
-        
-
     });
 });
 

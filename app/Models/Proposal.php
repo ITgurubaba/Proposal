@@ -23,4 +23,9 @@ class Proposal extends Model
     {
         return $this->hasMany(ProposalService::class);
     }
+
+    public function contents()
+    {
+        return $this->hasMany(ProposalContent::class)->orderBy('sort_order');
+    }
 }
