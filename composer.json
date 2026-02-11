@@ -7,7 +7,7 @@
     "require": {
         "php": "^8.1",
         "barryvdh/laravel-debugbar": "^3.7",
-        "barryvdh/laravel-dompdf": "^2.0",
+        "barryvdh/laravel-dompdf": "^2.2",
         "binafy/laravel-user-monitoring": "^v1.1.5",
         "codeat3/blade-fontisto-icons": "^1.4",
         "darryldecode/cart": "^4.2",

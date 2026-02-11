@@ -13,14 +13,7 @@
 
             <x-mary-input label="Base Price" type="number" wire:model="base_price" />
 
-            <x-mary-select
-                label="Pricing Type"
-                wire:model="pricing_type"
-                :options="[
-                    ['id' => 'individual', 'name' => 'Individual'],
-                    ['id' => 'bulk', 'name' => 'Bulk']
-                ]"
-                option-label="name"
+            <x-mary-select label="Pricing Type" wire:model="pricing_type" :options="[['id' => 'individual', 'name' => 'Individual'], ['id' => 'bulk', 'name' => 'Bulk']]" option-label="name"
                 option-value="id" />
 
             <div class="col-span-3">
@@ -45,14 +38,12 @@
                     @endif
                 </h2>
 
-                <x-mary-button
-                    icon="o-trash"
-                    class="btn-error btn-sm"
+                <x-mary-button icon="o-trash" class="btn-error btn-sm"
                     wire:click="deleteService({{ $service->id }})" />
             </div>
 
             {{-- ================= SUB SERVICES ================= --}}
-            <h3 class="font-semibold mb-2">Sub Services</h3>
+            <h3 class="font-semibold mb-2">Line Items</h3>
 
             <table class="table w-full mb-4">
                 <thead>
@@ -66,16 +57,12 @@
                     @foreach ($service->items as $item)
                         <tr>
                             <td>{{ $item->name }}</td>
-                            <td>{{ $item->price !== null ? '£'.$item->price : 'Included' }}</td>
+                            <td>{{ $item->price !== null ? '£' . $item->price : 'Included' }}</td>
                             <td>
-                                <x-mary-button
-                                    icon="o-pencil"
-                                    class="btn-warning btn-xs"
+                                <x-mary-button icon="o-pencil" class="btn-warning btn-xs"
                                     wire:click="editItem({{ $item->id }})" />
 
-                                <x-mary-button
-                                    icon="o-trash"
-                                    class="btn-error btn-xs"
+                                <x-mary-button icon="o-trash" class="btn-error btn-xs"
                                     wire:click="deleteItem({{ $item->id }})" />
                             </td>
                         </tr>
@@ -85,7 +72,7 @@
 
             {{-- SUB SERVICE FORM --}}
             <form
-                wire:submit.prevent="{{ $editItemId ? 'updateItem('.$service->id.')' : 'saveItem('.$service->id.')' }}"
+                wire:submit.prevent="{{ $editItemId ? 'updateItem(' . $service->id . ')' : 'saveItem(' . $service->id . ')' }}"
                 class="grid grid-cols-3 gap-3 mb-6">
 
                 <x-mary-input label="Sub Service Name" wire:model="item_name" placeholder="VAT Registration" />
@@ -100,7 +87,7 @@
             </form>
 
             {{-- ================= SERVICE FIELDS ================= --}}
-            <h3 class="font-semibold mb-2">Service Fields</h3>
+            <h3 class="font-semibold mb-2">Service Variables</h3>
 
             <table class="table w-full mb-4">
                 <thead>
@@ -118,14 +105,10 @@
                             <td>{{ $field->field_type }}</td>
                             <td>{{ $field->is_required ? 'Yes' : 'No' }}</td>
                             <td>
-                                <x-mary-button
-                                    icon="o-pencil"
-                                    class="btn-warning btn-xs"
+                                <x-mary-button icon="o-pencil" class="btn-warning btn-xs"
                                     wire:click="editField({{ $field->id }})" />
 
-                                <x-mary-button
-                                    icon="o-trash"
-                                    class="btn-error btn-xs"
+                                <x-mary-button icon="o-trash" class="btn-error btn-xs"
                                     wire:click="deleteField({{ $field->id }})" />
                             </td>
                         </tr>
@@ -135,32 +118,28 @@
 
             {{-- SERVICE FIELD FORM --}}
             <form
-                wire:submit.prevent="{{ $editFieldId ? 'updateField('.$service->id.')' : 'saveField('.$service->id.')' }}"
+                wire:submit.prevent="{{ $editFieldId ? 'updateField(' . $service->id . ')' : 'saveField(' . $service->id . ')' }}"
                 class="grid grid-cols-4 gap-3">
 
                 <x-mary-input label="Field Name" wire:model="field_name" placeholder="vat_scheme" />
 
                 <x-mary-input label="Field Label" wire:model="field_label" placeholder="VAT Scheme" />
 
-                <x-mary-select
-                    label="Field Type"
-                    wire:model.live="field_type"
-                    :options="[
-                        ['id' => 'text', 'name' => 'Text'],
-                        ['id' => 'number', 'name' => 'Number'],
-                        ['id' => 'select', 'name' => 'Select'],
-                        ['id' => 'date', 'name' => 'Date'],
-                    ]"
-                    option-label="name"
+                <x-mary-select label="Field Type" wire:model.live="field_type" :options="[
+                    ['id' => 'text', 'name' => 'Text'],
+                    ['id' => 'number', 'name' => 'Number'],
+                    ['id' => 'select', 'name' => 'Select'],
+                    ['id' => 'date', 'name' => 'Single Date'],
+                    ['id' => 'date_range', 'name' => 'Date Range'],
+                ]" option-label="name"
                     option-value="id" />
+
 
                 <x-mary-checkbox label="Required" wire:model="is_required" />
 
                 @if ($field_type === 'select')
                     <div class="col-span-4">
-                        <x-mary-input
-                            label="Options (comma separated)"
-                            wire:model="options"
+                        <x-mary-input label="Options (comma separated)" wire:model="options"
                             placeholder="Monthly, Quarterly, Yearly" />
                     </div>
                 @endif

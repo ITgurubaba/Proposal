@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
+@livewireStyles
+
     {{ Vite::useBuildDirectory('build/admin') }}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -37,7 +39,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
 
     {{-- Sortable.js --}}
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.1/Sortable.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.1/Sortable.min.js"></script>
+
 </head>
 <body class="font-sans antialiased customScrollbar max-w-[1920px] mx-auto" >
 
@@ -129,5 +132,6 @@
         window.dispatchEvent(event);
     }
 </script>
+@livewireScripts
 </body>
 </html>

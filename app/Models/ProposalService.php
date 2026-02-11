@@ -12,7 +12,8 @@ class ProposalService extends Model
         'proposal_id',
         'service_id',
         'price',
-        'data', // json (user selections)
+        'data', 
+        'sort_order', 
     ];
 
     protected $casts = [

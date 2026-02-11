@@ -68,11 +68,9 @@ class ProposalCreatePage extends Component
                     $this->edited_contents['service_' . $content->content_id] = $content->content;
                 }
 
-                if ($content->content_type === 'other') {
-                    $this->selected_other_contents[] = $content->source_content_id;
-
-                    $this->edited_contents['other_' . $content->source_content_id]
-                        = $content->content;
+                if ($content->type === 'other') {
+                    $this->selected_other_contents[] = $content->content_id;
+                    $this->edited_contents['other_' . $content->content_id] = $content->content;
                 }
             }
         }
@@ -292,13 +290,26 @@ class ProposalCreatePage extends Component
         $this->total_price = 0;
 
         foreach ($this->selected_services as $serviceId) {
+            $service = Service::find($serviceId);
+            if (!$service) continue;
 
-            $servicePrice = $this->calculateServicePrice($serviceId);
-
-            $this->total_price += $servicePrice;
+            if ($service->pricing_type === 'bulk') {
+                $this->total_price += !empty($this->service_data[$serviceId]['custom_price'])
+                    ? (float) $this->service_data[$serviceId]['custom_price']
+                    : (float) $service->base_price;
+            } else {
+                if (!empty($this->service_data[$serviceId]['items'])) {
+                    foreach ($this->service_data[$serviceId]['items'] as $itemId => $selected) {
+                        if ($selected) {
+                            $this->total_price += !empty($this->service_data[$serviceId]['item_prices'][$itemId])
+                                ? (float) $this->service_data[$serviceId]['item_prices'][$itemId]
+                                : (float) optional($service->items()->find($itemId))->price;
+                        }
+                    }
+                }
+            }
         }
     }
-
     public function toggleEditor($contentId)
     {
         if (in_array($contentId, $this->open_editors)) {
@@ -317,31 +328,6 @@ class ProposalCreatePage extends Component
 
             if (!isset($this->edited_contents[$key])) {
                 $content = ServiceContent::find($contentId);
-                $this->edited_contents[$key] = $content?->content ?? '';
-            }
-        }
-    }
-
-    public function toggleOtherEditor($contentId)
-    {
-        if (in_array($contentId, $this->open_editors)) {
-
-            // CLOSE
-            $this->open_editors = array_diff($this->open_editors, [$contentId]);
-        } else {
-
-            // OPEN
-            $this->open_editors[] = $contentId;
-
-            // Ensure checkbox selected
-            if (!in_array($contentId, $this->selected_other_contents)) {
-                $this->selected_other_contents[] = $contentId;
-            }
-
-            $key = 'other_' . $contentId;
-
-            if (!isset($this->edited_contents[$key])) {
-                $content = OtherContent::find($contentId);
                 $this->edited_contents[$key] = $content?->content ?? '';
             }
         }
@@ -375,17 +361,13 @@ class ProposalCreatePage extends Component
 
         /* SERVICES */
         foreach ($this->selected_services as $serviceId) {
-
-            $servicePrice = $this->calculateServicePrice($serviceId);
-
             ProposalService::create([
                 'proposal_id' => $proposal->id,
-                'service_id'  => $serviceId,
-                'price'       => $servicePrice, // ✅ CORRECT PRICE SAVE
-                'data'        => $this->service_data[$serviceId] ?? [],
+                'service_id' => $serviceId,
+                'price' => 0,
+                'data' => $this->service_data[$serviceId] ?? [],
             ]);
         }
-
 
 
         /* SERVICE CONTENTS */
