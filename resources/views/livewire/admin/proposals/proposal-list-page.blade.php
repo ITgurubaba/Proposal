@@ -24,6 +24,14 @@
                 <strong>{{ $item->id }}</strong>
             @endscope
 
+            @scope('cell_signed', $item)
+                @if ($item->isSigned())
+                    <x-mary-icon name="o-check-circle" class="text-green-500 w-6 h-6" />
+                @else
+                    <x-mary-icon name="o-minus-circle" class="text-gray-300 w-6 h-6" />
+                @endif
+            @endscope
+
             @scope('cell_client_name', $item)
                 <div>
                     <div class="font-semibold">{{ $item->client->company_name ?? 'N/A' }}</div>
@@ -45,12 +53,16 @@
                         Sent
                     </span>
                 @elseif($item->status === 'accepted')
-                    <span class="btn btn-sm btn-success">
+                    <span class="btn btn-sm btn-info">
                         Accepted
                     </span>
                 @elseif($item->status === 'rejected')
                     <span class="btn btn-sm btn-error">
                         Rejected
+                    </span>
+                @elseif($item->status === 'approved')
+                    <span class="btn btn-sm btn-success">
+                        Approved
                     </span>
                 @endif
             @endscope
@@ -72,6 +84,22 @@
                         <x-mary-button icon="o-pencil" class="btn-sm btn-warning btn-circle" tooltip="Edit"
                             href="{{ route('admin::proposals:edit', ['proposal_id' => $item->id]) }}" wire:navigate />
                     @endif
+
+                    {{-- ✅ Send Proposal Link Button --}}
+                    @if (in_array($item->status, ['sent', 'accepted']) && !$item->isSigned())
+                        <x-mary-button icon="o-paper-airplane" class="btn-sm btn-success btn-circle"
+                            tooltip="Send Signing Link" wire:click="openSendLinkModal({{ $item->id }})" />
+                    @endif
+
+                    {{-- ✅ View Signed PDF --}}
+                    @if ($item->isSigned() && $item->signed_pdf_path)
+                            <a href="{{ route('admin::proposals:download-signed', $item->id) }}"
+                            class="btn btn-sm btn-primary"
+                            target="_blank">
+                                Download
+                            </a>
+                        @endif
+
 
                     <div x-data="{
                         confirmDelete(id) {
@@ -97,4 +125,37 @@
 
         </x-mary-table>
     </x-mary-card>
+
+    {{-- Send Proposal Link Modal --}}
+    <x-mary-modal title="Send Proposal Signing Link" wire:model="showSendLinkModal" class="backdrop-blur">
+        @php($proposalId = $selectedProposalId ?? 0)
+        <div class="space-y-4" x-data="{ proposalId: {{ $proposalId }} }">
+            <p class="text-gray-600">
+                Share this secure link with your client to sign the proposal:
+            </p>
+            <div class="flex gap-2">
+                <x-mary-input readonly x-model="proposalId" x-bind:value="'/proposal/sign/' + proposalId"
+                    class="flex-1" />
+                <x-mary-button icon="o-clipboard" class="btn-primary"
+                    @click="navigator.clipboard.writeText('/proposal/sign/' + proposalId); $dispatch('notify', { message: 'Link copied!' })" />
+            </div>
+            <p class="text-sm text-gray-500">
+                Or send directly via email:
+            </p>
+            @if ($selectedClientEmail)
+                <div class="bg-gray-100 p-3 rounded text-sm">
+                    <strong>Email will be sent to:</strong><br>
+                    <span class="text-primary font-semibold">
+                        {{ $selectedClientEmail }}
+                    </span>
+                </div>
+            @endif
+
+            <x-mary-button label="Send Email to Client" icon="o-paper-airplane" class="btn-primary w-full"
+                wire:click="sendProposalEmail" />
+        </div>
+        <x-slot:actions>
+            <x-mary-button label="Close" @click="$wire.showSendLinkModal = false" />
+        </x-slot:actions>
+    </x-mary-modal>
 </div>

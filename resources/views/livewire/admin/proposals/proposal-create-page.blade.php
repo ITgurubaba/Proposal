@@ -239,7 +239,8 @@
                                                                 <button type="button"
                                                                     class="text-xs text-primary underline"
                                                                     wire:click="toggleEditor({{ $content->id }})">
-                                                                    {{ in_array($content->id, $open_editors) ? 'Minimize' : 'Edit' }}
+                                                                   
+                                                                    {{ in_array($content->id, $open_service_editors) ? 'Minimize' : 'Edit' }}
                                                                 </button>
 
                                                             </div>
@@ -251,7 +252,7 @@
                                                             </div>
 
                                                             {{-- Editor --}}
-                                                            @if (in_array($content->id, $open_editors))
+                                                            @if (in_array($content->id, $open_service_editors))
                                                                 {{-- INSERT FIELD DROPDOWN --}}
                                                                 <div class="mb-3 flex flex-wrap items-center gap-6">
 
@@ -357,7 +358,7 @@
                                                                                 <button type="button"
                                                                                     class="text-xs text-primary underline"
                                                                                     wire:click="toggleEditor({{ $content->id }})">
-                                                                                    {{ in_array($content->id, $open_editors) ? 'Minimize' : 'Edit' }}
+                                                                                    {{ in_array($content->id, $open_service_editors) ? 'Minimize' : 'Edit' }}
                                                                                 </button>
 
                                                                             </div>
@@ -369,7 +370,7 @@
                                                                             </div>
 
                                                                             {{-- Editor --}}
-                                                                            @if (in_array($content->id, $open_editors))
+                                                                            @if (in_array($content->id, $open_service_editors))
                                                                                 {{-- INSERT FIELD DROPDOWN --}}
                                                                                 <div
                                                                                     class="mb-3 flex flex-wrap items-center gap-6">
@@ -492,12 +493,12 @@
                                                 @if (in_array($content->id, $selected_other_contents))
                                                     <button type="button" class="text-xs text-primary underline"
                                                         wire:click="toggleOtherEditor({{ $content->id }})">
-                                                        {{ in_array($content->id, $open_editors) ? 'Minimize' : 'Edit' }}
+                                                        {{ in_array($content->id, $open_other_editors) ? 'Minimize' : 'Edit' }}
                                                     </button>
                                                 @endif
 
                                             </div>
-                                            @if (in_array($content->id, $open_editors))
+                                            @if (in_array($content->id, $open_other_editors))
                                                 <div class="mt-3">
                                                     <label class="text-xs text-gray-600 mb-1 block">
                                                         Edit Content (Proposal Specific):

@@ -245,14 +245,7 @@
                 <div class="space-y-2">
                     @if ($proposal->status === 'draft')
                         <x-mary-button type="button" class="btn-primary w-full" wire:click="sendProposal">
-                            Send Proposal
-                        </x-mary-button>
-                    @elseif($proposal->status === 'sent')
-                        <x-mary-button type="button" class="btn-success w-full" wire:click="markAsAccepted">
-                            Mark as Accepted
-                        </x-mary-button>
-                        <x-mary-button type="button" class="btn-error w-full" wire:click="markAsRejected">
-                            Mark as Rejected
+                            Ready to Send Proposal
                         </x-mary-button>
                     @endif
                 </div>
@@ -340,13 +333,20 @@
 
                 <div class="border p-4 bg-white text-black"
                     style="font-family: Arial; line-height:1.6; 
-            max-height: 600px; 
-            overflow-y: auto;">
-
+                    max-height: 600px; 
+                    overflow-y: auto;">
+                    {{-- LOGO --}}
+                        <div class="mb-4">
+                            <img 
+                                src="{{ asset(config('settings.admin_logo','assets/default/logo/flow.png')) }}"
+                                alt="Company Logo"
+                                style="max-height: 80px; margin: 0 auto;"
+                            >
+                        </div>
                     {{-- HEADER --}}
                     <div class="text-center mb-8">
                         <h2 class="text-2xl font-bold">PROPOSAL</h2>
-                        <p>Proposal #{{ $proposal->id }}</p>
+                        {{-- <p>Proposal #{{ $proposal->id }}</p> --}}
                         <p>Date: {{ $proposal->created_at->format('M d, Y') }}</p>
                     </div>
 

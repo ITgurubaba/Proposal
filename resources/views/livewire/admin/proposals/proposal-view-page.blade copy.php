@@ -65,7 +65,7 @@
                                         </div>
                                     </div>
                                     <div class="text-xl font-bold text-primary">
-                                        £{{ number_format($proposal->total_price, 2) }}
+                                        £{{ number_format($proposalService->price, 2) }}
 
                                     </div>
                                 </div>
@@ -209,38 +209,6 @@
                     </div>
                 @endif
             </x-mary-card>
-
-            {{-- Proposal Contents --}}
-            @if ($proposal->contents->count() > 0)
-                <x-mary-card class="shadow border mb-4">
-                    <h3 class="text-lg font-semibold mb-4">Proposal Contents</h3>
-                    <div class="space-y-4">
-                        @foreach ($proposal->contents as $content)
-                            <div class="border rounded-lg p-4">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <div class="font-semibold text-lg">{{ $content->title }}</div>
-                                    @if ($content->content_type === 'service')
-                                        <x-mary-badge value="Service" class="badge-info" />
-                                    @else
-                                        <x-mary-badge value="Sub-Serive" class="badge-secondary" />
-                                    @endif
-                                </div>
-                                @if ($content->service)
-                                    <div class="text-sm text-gray-500 mb-2">Service: {{ $content->service->name }}
-                                    </div>
-                                @endif
-                                @if ($content->service_item)
-                                    <div class="text-sm text-gray-500 mb-2">Item: {{ $content->service_item->name }}
-                                    </div>
-                                @endif
-                                <div class="text-sm text-gray-600 prose prose-sm max-w-none">
-                                    {!! $this->renderProcessedContent($content) !!}
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </x-mary-card>
-            @endif
         </div>
 
         {{-- Right Column - Summary & Actions --}}
@@ -310,19 +278,82 @@
                     </div>
                 </div>
             </x-mary-card>
+            
+            <x-mary-card class="shadow border mt-6">
+                <h3 class="text-lg font-semibold mb-4">Content Align</h3>
+
+                {{-- SERVICES --}}
+                <div class="mb-6">
+                    <div class="font-semibold mb-3">Services</div>
+
+                    <ul x-data x-init="new Sortable($el, {
+                        animation: 150,
+                        onEnd: (event) => {
+                            let order = Array.from($el.children)
+                                .map(el => el.dataset.id);
+                    
+                            $wire.updateServiceOrder(order);
+                        }
+                    })" class="space-y-2">
+
+                        @foreach ($proposal->services->sortBy('sort_order') as $service)
+                            <li data-id="{{ $service->id }}"
+                                class="p-3 bg-gray-100 rounded cursor-move shadow-sm">
+
+                                {{ $service->service->name }}
+
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+
+                {{-- OTHER CONTENT --}}
+                <div>
+                    <div class="font-semibold mb-3">Other Contents</div>
+
+                    <ul x-data x-init="new Sortable($el, {
+                        animation: 150,
+                        onEnd: (event) => {
+                            let order = Array.from($el.children)
+                                .map(el => el.dataset.id);
+                    
+                            $wire.updateOtherOrder(order);
+                        }
+                    })" class="space-y-2">
+
+                        @foreach ($proposal->contents->where('content_type', 'other')->sortBy('sort_order') as $content)
+                            <li data-id="{{ $content->id }}" class="p-3 bg-gray-100 rounded cursor-move shadow-sm">
+
+                                {{ $content->title }}
+
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            </x-mary-card>
+
+
+
 
             <x-mary-card class="shadow border mt-6">
                 <h3 class="text-lg font-semibold mb-4">PDF Preview</h3>
 
                 <div class="border p-4 bg-white text-black"
                     style="font-family: Arial; line-height:1.6; 
-            max-height: 600px; 
-            overflow-y: auto;">
-
+                    max-height: 600px; 
+                    overflow-y: auto;">
+                    {{-- LOGO --}}
+                        <div class="mb-4">
+                            <img 
+                                src="{{ asset(config('settings.admin_logo','assets/default/logo/flow.png')) }}"
+                                alt="Company Logo"
+                                style="max-height: 80px; margin: 0 auto;"
+                            >
+                        </div>
                     {{-- HEADER --}}
                     <div class="text-center mb-8">
                         <h2 class="text-2xl font-bold">PROPOSAL</h2>
-                        <p>Proposal #{{ $proposal->id }}</p>
+                        {{-- <p>Proposal #{{ $proposal->id }}</p> --}}
                         <p>Date: {{ $proposal->created_at->format('M d, Y') }}</p>
                     </div>
 
@@ -345,7 +376,8 @@
                     <div class="mb-8">
                         <h4 class="font-bold mb-4 border-b pb-1">Selected Services</h4>
 
-                        @foreach ($proposal->services as $proposalService)
+                        @foreach ($proposal->services->sortBy('sort_order') as $proposalService)
+
 
                             <div class="mb-6">
 
@@ -473,7 +505,7 @@
                         <div class="mb-8">
                             <h4 class="font-bold mb-4 border-b pb-1">Additional Proposal Content</h4>
 
-                            @foreach ($proposal->contents as $content)
+                            @foreach ($proposal->contents->sortBy('sort_order') as $content)
                                 <div class="mb-4">
                                     <div class="font-semibold">{{ $content->title }}</div>
                                     <div class="text-sm">

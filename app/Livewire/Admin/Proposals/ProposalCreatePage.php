@@ -32,7 +32,9 @@ class ProposalCreatePage extends Component
     public $selected_other_contents = [];
     public $edited_contents = [];
 
-    public $open_editors = [];
+    public $open_service_editors = [];
+    public $open_other_editors = [];
+
 
     protected $rules = [
         'client_id' => 'required|exists:clients,id',
@@ -190,10 +192,8 @@ class ProposalCreatePage extends Component
     }
 
     public function replaceServicePlaceholders(string $content, int $serviceId): string
-    {
-        if (!isset($this->service_data[$serviceId]['fields'])) {
-            return $content;
-        }
+{
+    if (isset($this->service_data[$serviceId]['fields'])) {
 
         foreach ($this->service_data[$serviceId]['fields'] as $fieldId => $value) {
 
@@ -202,7 +202,6 @@ class ProposalCreatePage extends Component
 
             $placeholder = '[' . $field->field_name . ']';
 
-            // ✅ HANDLE DATE RANGE ARRAY
             if (is_array($value)) {
 
                 $start = $value['start'] ?? '';
@@ -211,14 +210,20 @@ class ProposalCreatePage extends Component
                 $formatted = trim($start . ' to ' . $end);
 
                 $content = str_replace($placeholder, $formatted, $content);
+
             } else {
+
                 $content = str_replace($placeholder, (string) $value, $content);
             }
         }
-        $content = $this->replaceClientPlaceholders($content);
-
-        return $content;
     }
+
+    // ✅ ALWAYS replace client placeholders
+    $content = $this->replaceClientPlaceholders($content);
+
+    return $content;
+}
+
 
 
 
@@ -301,13 +306,10 @@ class ProposalCreatePage extends Component
 
     public function toggleEditor($contentId)
     {
-        if (in_array($contentId, $this->open_editors)) {
-            // CLOSE
-            $this->open_editors = array_diff($this->open_editors, [$contentId]);
+        if (in_array($contentId, $this->open_service_editors)) {
+            $this->open_service_editors = array_diff($this->open_service_editors, [$contentId]);
         } else {
-            // OPEN
-            $this->open_editors[] = $contentId;
-
+            $this->open_service_editors[] = $contentId;
             // ensure content selected
             if (!in_array($contentId, $this->selected_service_contents)) {
                 $this->selected_service_contents[] = $contentId;
@@ -323,29 +325,34 @@ class ProposalCreatePage extends Component
     }
 
     public function toggleOtherEditor($contentId)
-    {
-        if (in_array($contentId, $this->open_editors)) {
+{
+    if (in_array($contentId, $this->open_other_editors)) {
 
-            // CLOSE
-            $this->open_editors = array_diff($this->open_editors, [$contentId]);
-        } else {
+        // CLOSE
+        $this->open_other_editors = array_diff(
+            $this->open_other_editors,
+            [$contentId]
+        );
 
-            // OPEN
-            $this->open_editors[] = $contentId;
+    } else {
 
-            // Ensure checkbox selected
-            if (!in_array($contentId, $this->selected_other_contents)) {
-                $this->selected_other_contents[] = $contentId;
-            }
+        // OPEN
+        $this->open_other_editors[] = $contentId;
 
-            $key = 'other_' . $contentId;
+        // Ensure checkbox selected
+        if (!in_array($contentId, $this->selected_other_contents)) {
+            $this->selected_other_contents[] = $contentId;
+        }
 
-            if (!isset($this->edited_contents[$key])) {
-                $content = OtherContent::find($contentId);
-                $this->edited_contents[$key] = $content?->content ?? '';
-            }
+        $key = 'other_' . $contentId;
+
+        if (!isset($this->edited_contents[$key])) {
+            $content = OtherContent::find($contentId);
+            $this->edited_contents[$key] = $content?->content ?? '';
         }
     }
+}
+
 
 
     /* =======================

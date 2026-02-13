@@ -3,6 +3,8 @@
 use App\Livewire\Admin\Services\ServiceManager;
 use Illuminate\Support\Facades\Route;
 use UniSharp\LaravelFilemanager\Lfm;
+use App\Models\Proposal;
+use Illuminate\Support\Facades\Storage;
 /*
 |--------------------------------------------------------------------------
 | Admin Routes
@@ -141,6 +143,24 @@ Route::group([
             Route::get('/edit/{proposal_id}', 'ProposalCreatePage')->name('edit');
 
             Route::get('/view/{proposal_id}', 'ProposalViewPage')->name('view');
+
+            Route::get('/download-signed/{proposal}', function (Proposal $proposal) {
+
+                if (!$proposal->isSigned() || empty($proposal->signed_pdf_path)) {
+                    abort(404, 'Signed PDF not found');
+                }
+
+                $filePath = $proposal->signed_pdf_path;
+
+                if (!Storage::disk('public')->exists($filePath)) {
+                    abort(404, 'File not found');
+                }
+
+                return response()->download(
+                    Storage::disk('public')->path($filePath),
+                    'proposal-' . $proposal->id . '-signed.pdf'
+                );
+            })->name('download-signed');
         });
 
 

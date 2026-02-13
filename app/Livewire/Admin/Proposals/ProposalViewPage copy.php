@@ -49,19 +49,19 @@ class ProposalViewPage extends Component
     {
         $this->proposal->status = 'sent';
         $this->proposal->save();
-        $this->success('Proposal', 'Ready to Sent');
+        $this->success('Proposal', 'Sent successfully');
     }
 
-    public function updateServiceOrder($order)
-    {
-        foreach ($order as $index => $serviceId) {
+  public function updateServiceOrder($order)
+{
+    foreach ($order as $index => $serviceId) {
 
-            ProposalService::where('id', $serviceId)
-                ->update(['sort_order' => $index]);
-        }
-
-        $this->proposal->refresh();
+        ProposalService::where('id', $serviceId)
+            ->update(['sort_order' => $index]);
     }
+
+    $this->proposal->refresh();
+}
 
 
     public function updateOtherOrder($order)
@@ -74,7 +74,21 @@ class ProposalViewPage extends Component
         $this->proposal->refresh();
     }
 
-    
+
+    public function markAsAccepted()
+    {
+        $this->proposal->status = 'accepted';
+        $this->proposal->save();
+        $this->success('Proposal', 'Marked as accepted');
+    }
+
+    public function markAsRejected()
+    {
+        $this->proposal->status = 'rejected';
+        $this->proposal->save();
+        $this->success('Proposal', 'Marked as rejected');
+    }
+
     /* =====================================================
        CLIENT PLACEHOLDER REPLACEMENT
     ====================================================== */
